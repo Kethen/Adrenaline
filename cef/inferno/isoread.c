@@ -146,7 +146,7 @@ static int iso_get_nsector(SceUID fd)
 	total = sceIoLseek(fd, 0, PSP_SEEK_END);
 	sceIoLseek(fd, off, PSP_SEEK_SET);
 
-	return total / ISO_SECTOR_SIZE;
+	return (u32)total / ISO_SECTOR_SIZE;
 }
 
 // 0x00000E58
@@ -182,7 +182,7 @@ static int is_ciso(SceUID fd)
 
 	if(*magic == 0x4F534943) { // CISO
 		g_CISO_cur_idx = -1;
-		g_ciso_total_block = g_CISO_hdr.total_bytes / g_CISO_hdr.block_size;
+		g_ciso_total_block = (u32)g_CISO_hdr.total_bytes / g_CISO_hdr.block_size;
 		printk("%s: total block %d\n", __func__, (int)g_ciso_total_block);
 
 		if(g_ciso_dec_buf == NULL) {
@@ -479,7 +479,7 @@ static int refresh_cso_index(u32 size, u32 offset) {
 	// out of scope, read cso index table again
 	if (starting_block < g_cso_idx_start_block|| ending_block >= g_cso_idx_start_block + CISO_IDX_MAX_ENTRIES) {
 
-		u32 total_blocks = g_CISO_hdr.total_bytes / g_CISO_hdr.block_size;
+		u32 total_blocks = (u32)g_CISO_hdr.total_bytes / g_CISO_hdr.block_size;
 
 		if (starting_block > total_blocks) {
 			// the requested block goes beyond the max block number
