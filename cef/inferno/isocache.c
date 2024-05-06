@@ -409,7 +409,7 @@ int infernoCacheInit(int cache_size, int cache_num)
 		return -1;
 	}
 	
-	memid = sceKernelAllocPartitionMemory(9, "infernoCacheCtl", PSP_SMEM_High, g_caches_num * sizeof(g_caches[0]), NULL);
+	memid = sceKernelAllocPartitionMemory(PSP_MEMORY_PARTITION_USER, "infernoCacheCtl", PSP_SMEM_High, g_caches_num * sizeof(g_caches[0]), NULL);
 
 	if(memid < 0) {
 		printk("%s: sctrlKernelAllocPartitionMemory -> 0x%08X\n", __func__, memid); 
@@ -422,7 +422,7 @@ int infernoCacheInit(int cache_size, int cache_num)
 		return -3;
 	}
 
-	memid = sceKernelAllocPartitionMemory(9, "infernoCache", PSP_SMEM_High, g_caches_cap * g_caches_num + 64, NULL);
+	memid = sceKernelAllocPartitionMemory(PSP_MEMORY_PARTITION_USER, "infernoCache", PSP_SMEM_High, g_caches_cap * g_caches_num + 64, NULL);
 
 	if(memid < 0) {
 		printk("%s: sctrlKernelAllocPartitionMemory -> 0x%08X\n", __func__, memid);
@@ -439,6 +439,8 @@ int infernoCacheInit(int cache_size, int cache_num)
 	}
 
 	cache_on = 1;
+
+	printk("cache is now on with size: %d, segments: %d\n", g_caches_cap, g_caches_num);
 
 	return 0;
 }

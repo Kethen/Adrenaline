@@ -19,17 +19,21 @@
 #define PRINTK_H
 
 #ifdef DEBUG
+#include <pspiofilemgr.h>
+#include <stdio.h>
+
 int printk_init(const char* filename);
-int printk(char *fmt, ...)__attribute__((format (printf, 1, 2)));
-int printk_sync(void);
-void printk_lock(void);
-void printk_unlock(void);
+extern int printk_fd;
+#define printk(...){ \
+    if(printk_fd >= 0){ \
+        char _printk_buf[1024]; \
+        int _printk_len = sprintf(_printk_buf, __VA_ARGS__); \
+        sceIoWrite(printk_fd, _printk_buf, _printk_len); \
+    } \
+}
 #else
 #define printk_init(...)
 #define printk(...)
-#define printk_sync()
-#define printk_lock()
-#define printk_unlock()
 #endif
 
 #endif

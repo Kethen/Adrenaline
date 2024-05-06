@@ -126,7 +126,7 @@ int module_start(SceSize args, void* argp)
 		}
 
 		//infernoCacheSetPolicy(config.iso_cache_policy);
-		infernoCacheSetPolicy(CACHE_POLICY_LRU);
+		infernoCacheSetPolicy(0);
 		//infernoCacheInit(bufsize, config.iso_cache_num);
 		infernoCacheInit(bufsize, 256);
 	}

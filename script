@@ -3,6 +3,26 @@ set -xe
 project_pwd=$(pwd)
 project_pwd=$(realpath "$project_pwd")
 
+cp procfw_sdk_prebuilt/include/* /usr/local/pspdev/psp/sdk/include/
+cp procfw_sdk_prebuilt/lib/* /usr/local/pspdev/psp/sdk/lib/
+
+cd cef/inferno
+make clean
+make
+cd "$project_pwd"
+
+cp cef/inferno/inferno.prx user/flash0/kd/inferno.prx
+
+if false
+then
+    cd cef/systemctrl
+    make clean
+    make
+    cd "$project_pwd"
+
+    cp cef/systemctrl/systemctrl.prx user/flash0/kd/systemctrl.prx
+fi
+
 rm -rf kernel_build
 mkdir -p kernel_build
 cd kernel_build
@@ -55,3 +75,4 @@ mkdir -p bubble_build
 cd bubble_build
 cmake ../bubble
 make
+

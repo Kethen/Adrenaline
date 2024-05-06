@@ -1,12 +1,13 @@
 TARGET = inferno
-OBJS = main.o iodrv_funcs.o umd.o isoread.o inferno_patch_offset.o isocache.o imports.o utils.o sctrlrand.o exports.o
+OBJS = main.o iodrv_funcs.o umd.o isoread.o inferno_patch_offset.o isocache.o imports.o utils.o sctrlrand.o exports.o printk.o
 
 INCDIR = ../include
-CFLAGS = -Os -G0 -Wall -fshort-wchar -fno-pic -mno-check-zero-division
+CFLAGS = -Os -G0 -Wall -fshort-wchar -fno-pic -mno-check-zero-division -fno-builtin
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 
 CFLAGS += -DCONFIG_661=1
+CFLAGS += -DDEBUG=1
 PSP_FW_VERSION = 661
 
 BUILD_PRX = 1
