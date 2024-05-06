@@ -1,0 +1,51 @@
+set -xe
+
+project_pwd=$(pwd)
+project_pwd=$(realpath "$project_pwd")
+
+rm -rf kernel_build
+mkdir -p kernel_build
+cd kernel_build
+cmake ../kernel
+make
+
+cp libAdrenalineKernel_stub.a /usr/local/vitasdk/arm-vita-eabi/lib/
+cp libAdrenalineKernel_stub_weak.a /usr/local/vitasdk/arm-vita-eabi/lib/
+
+cd "$project_pwd"
+
+if ! [ -e vita2dlib ]
+then
+    git clone https://github.com/frangarcj/vita2dlib.git -b fbo
+fi
+cd vita2dlib/libvita2d
+make clean
+make
+cp libvita2d.a /usr/local/vitasdk/arm-vita-eabi/lib/libvita2d.a
+cp include/vita2d.h /usr/local/vitasdk/arm-vita-eabi/include/vita2d.h
+
+cd "$project_pwd"
+
+if ! [ -e vita-shader-collection.tar.gz ]
+then
+    wget https://github.com/frangarcj/vita-shader-collection/releases/download/master-0.1-v86/vita-shader-collection.tar.gz
+fi
+tar -C /usr/local/vitasdk/arm-vita-eabi -xvf vita-shader-collection.tar.gz
+
+cd "$project_pwd"
+
+rm -rf user_build
+mkdir -p user_build
+cd user_build
+cmake ../user
+make
+
+cd "$project_pwd"
+
+rm -rf vsh_build
+mkdir -p vsh_build
+cd vsh_build
+cmake ../vsh
+make
+
+cd "$project_pwd"
