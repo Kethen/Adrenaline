@@ -22,6 +22,7 @@
 #include <psp2kern/kernel/threadmgr.h>
 #include <psp2kern/kernel/sysmem.h>
 #include <psp2kern/kernel/cpu.h>
+#include <psp2kern/kernel/sysroot.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -101,14 +102,14 @@ static int sceCompatSecSetSSRAMAclPatched() {
     a = 0x0E3F0000;
     if (module_nid == 0x8F2D0378) { // 3.60 retail
       ksceKernelMemcpyKernelToUser(0x70602D58, &a, sizeof(uint32_t));
-      ksceKernelCpuDcacheWritebackRange((void *)0x70602D58, sizeof(uint32_t));
+      ksceKernelDcacheCleanRange((void *)0x70602D58, sizeof(uint32_t));
     } else if (module_nid == 0x07937779 ||
                module_nid == 0x71BF9CC5 ||
                module_nid == 0x7C185186 ||
                module_nid == 0x52DFE3A7 ||
                module_nid == 0xE0E3AA51) { // 3.65-3.70 retail
       ksceKernelMemcpyKernelToUser(0x70602D70, &a, sizeof(uint32_t));
-      ksceKernelCpuDcacheWritebackRange((void *)0x70602D70, sizeof(uint32_t));
+      ksceKernelDcacheCleanRange((void *)0x70602D70, sizeof(uint32_t));
     }
   }
 

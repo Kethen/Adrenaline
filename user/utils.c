@@ -52,6 +52,19 @@ void _init_vita_newlib(void) {
   _init_vita_io();
 }
 
+void _free_vita_heap(void);
+void _free_vita_reent(void);
+void _free_vita_malloc(void);
+void _free_vita_io(void);
+
+void _free_vita_newlib(void)
+{
+  _free_vita_io();
+  _free_vita_malloc();
+  _free_vita_reent();
+  _free_vita_heap();
+}
+
 int debugPrintf(char *text, ...) {
   va_list list;
   char string[512];
