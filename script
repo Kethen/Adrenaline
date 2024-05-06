@@ -49,3 +49,9 @@ cmake ../vsh
 make
 
 cd "$project_pwd"
+
+rm -rf bubble_build
+mkdir -p bubble_build
+cd bubble_build
+cmake ../bubble
+make

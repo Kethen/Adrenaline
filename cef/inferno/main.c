@@ -107,14 +107,15 @@ int module_start(SceSize args, void* argp)
 	printk("Inferno started FW=0x%08X %02dg\n", (uint)psp_fw_version, (int)psp_model+1);
 
 	key_config = sceKernelApplicationType();
-#if 0
-	// TODO: read inferno config when implemented (iso cache, size, num and mode)
-	sctrlSEGetConfig(&config);
 
-	if(config.iso_cache && psp_model != PSP_1000 && key_config == PSP_INIT_KEYCONFIG_GAME) {
+	// TODO: read inferno config when implemented (iso cache, size, num and mode)
+	//sctrlSEGetConfig(&config);
+	//if(config.iso_cache && psp_model != PSP_1000 && key_config == PSP_INIT_KEYCONFIG_GAME) {
+	if(key_config == PSP_INIT_KEYCONFIG_GAME) {
 		int bufsize;
 
-		bufsize = config.iso_cache_total_size * 1024 * 1024 / config.iso_cache_num;
+		//bufsize = config.iso_cache_total_size * 1024 * 1024 / config.iso_cache_num;
+		bufsize = 20 * 1024 * 1024 / 256;
 
 		if((bufsize % 512) != 0) {
 			bufsize &= ~(512-1);
@@ -124,10 +125,11 @@ int module_start(SceSize args, void* argp)
 			bufsize = 512;
 		}
 
-		infernoCacheSetPolicy(config.iso_cache_policy);
-		infernoCacheInit(bufsize, config.iso_cache_num);
+		//infernoCacheSetPolicy(config.iso_cache_policy);
+		infernoCacheSetPolicy(CACHE_POLICY_LRU);
+		//infernoCacheInit(bufsize, config.iso_cache_num);
+		infernoCacheInit(bufsize, 256);
 	}
-#endif
 	ret = setup_umd_device();
 
 	if(ret < 0) {
