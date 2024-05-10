@@ -70,6 +70,7 @@ typedef struct {
   int trunc;
   int folder;
   int extra;
+  int iso_cache;
 } ScePspemuMsfsDescriptor;
 
 #define MAX_DESCRIPTORS 32

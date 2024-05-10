@@ -244,7 +244,7 @@ int iso_open(void)
 	retries = 0;
 
 	do {
-		g_iso_fd = sceIoOpen(g_iso_fn, 0x000F0001, 0777);
+		g_iso_fd = sceIoOpen(g_iso_fn, 0x000F0001, 0x000FFFFF);
 
 		if(g_iso_fd < 0) {
 			if(++retries >= 16) {

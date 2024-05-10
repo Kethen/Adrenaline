@@ -471,8 +471,11 @@ static int sceShellUtilRegisterSettingsHandlerPatched(int (* handler)(int a1, in
 static SceUID sceKernelCreateThreadPatched(const char *name, SceKernelThreadEntry entry, int initPriority,
                       int stackSize, SceUInt attr, int cpuAffinityMask,
                       const SceKernelThreadOptParam *option) {
+
+  debugPrintf("%s priority 0x%08x, stackSize 0x%08x, cpuAffinityMask 0x%08x\n", name, initPriority, stackSize, cpuAffinityMask);
   if (strcmp(name, "ScePspemuRemoteMsfs") == 0) {
     entry = (SceKernelThreadEntry)ScePspemuRemoteMsfs;
+    //cpuAffinityMask = SCE_KERNEL_CPU_MASK_USER_ALL;
   }
 
   return TAI_CONTINUE(SceUID, sceKernelCreateThreadRef, name, entry, initPriority, stackSize, attr, cpuAffinityMask, option);
@@ -511,6 +514,8 @@ int module_start(SceSize args, void *argp) {
 
   // Init vita newlib
   _init_vita_newlib();
+
+  sceIoRemove("ux0:data/adrenaline_user_log.txt");
 
   // Read config
   memset(&config, 0, sizeof(AdrenalineConfig));

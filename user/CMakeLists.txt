@@ -48,6 +48,7 @@ add_executable(adrenaline_user
   pops.c
   titleinfo.c
   flashfs.c
+  isocache.c
   msfs.c
   menu.c
   states.c

@@ -29,6 +29,7 @@
 #include "main.h"
 #include "utils.h"
 #include "msfs.h"
+#include "isocache.h"
 
 static ScePspemuMsfsDescriptor descriptor_list[MAX_DESCRIPTORS];
 
@@ -53,7 +54,7 @@ static void convertFileStat(SceIoStat *stat) {
   ScePspemuConvertStatTimeToLocaltime(stat);
 }
 
-static int ScePspemuMsfsAddDescriptor(SceUID fd, char *path, int flags, int trunc, int folder) {
+static int ScePspemuMsfsAddDescriptor(SceUID fd, char *path, int flags, int trunc, int folder, int iso_cache) {
   int i;
   for (i = 0; i < MAX_DESCRIPTORS; i++) {
     if (!descriptor_list[i].fd)
@@ -70,6 +71,7 @@ static int ScePspemuMsfsAddDescriptor(SceUID fd, char *path, int flags, int trun
   descriptor_list[i].trunc = trunc;
   descriptor_list[i].folder = folder;
   descriptor_list[i].extra = folder ? 0 : -1;
+  descriptor_list[i].iso_cache = iso_cache;
 
   // Root
   if (path[0] == '\0' || (path[0] == '/' && path[1] == '\0')) {
@@ -146,6 +148,7 @@ static int ScePspemuMsfsInit() {
 
 static int ScePspemuMsfsExit() {
   ScePspemuMsfsCloseAllDescriptors();
+  iso_cache_stop();
   return 0;
 }
 
@@ -172,11 +175,20 @@ static SceUID ScePspemuMsfsOpen(const char *file, int flags, SceMode mode) {
     }
   }
 
-  SceUID fd = sceIoOpen(msfs_path, flags, 0777);
-  if (fd < 0)
-    return fd;
+  int iso_cache = 0;
+  if(flags == 0x000F0001 && mode == 0x000FFFFF){
+    iso_cache = 1;
+    iso_cache_init(msfs_path);
+  }
 
-  return ScePspemuMsfsAddDescriptor(fd, (char *)file, flags, trunc, 0);
+  SceUID fd = -1;
+  if(!iso_cache){
+    fd = sceIoOpen(msfs_path, flags, 0777);
+    if (fd < 0)
+      return fd;
+  }
+
+  return ScePspemuMsfsAddDescriptor(fd, (char *)file, flags, trunc, 0, iso_cache);
 }
 
 static int ScePspemuMsfsTruncateFix(ScePspemuMsfsDescriptor *descriptor) {
@@ -251,6 +263,12 @@ static int ScePspemuMsfsClose(SceUID fd) {
       return res;
   }
 
+  if(descriptor->iso_cache){
+    iso_cache_stop();
+    ScePspemuMsfsRemoveDescriptor(fd);
+    return 0;
+  }
+
   int res = sceIoClose(descriptor->fd);
 
   // Fake close success
@@ -267,6 +285,51 @@ static int ScePspemuMsfsRead(SceUID fd, void *data, SceSize size) {
   ScePspemuMsfsDescriptor *descriptor = ScePspemuMsfsGetDescriptor(fd);
   if (!descriptor)
     return SCE_ERROR_ERRNO_EINVAL;
+
+  if(descriptor->iso_cache == 1){
+    SceOff res = sceIoLseek(iso_cache_fd(), descriptor->offset, SCE_SEEK_SET);
+    if((int)res == SCE_ERROR_ERRNO_ENODEV){
+      iso_cache_init("");
+      res = sceIoLseek(iso_cache_fd(), descriptor->offset, SCE_SEEK_SET);
+      if(res < 0){
+        return res;
+      }
+    }
+
+    res = sceIoLseek(iso_cache_fd(), size, SCE_SEEK_CUR);
+    if ((int)res == SCE_ERROR_ERRNO_ENODEV) {
+      iso_cache_init("");
+      res = sceIoLseek(iso_cache_fd(), descriptor->offset, SCE_SEEK_SET);
+      if (res >= 0)
+        res = sceIoLseek(iso_cache_fd(), size, SCE_SEEK_CUR);
+    }
+
+    if(res < 0){
+      debugPrintf("failed seeking during iso_cache usage\n");
+      return res;
+    }
+
+    int to_read = res - descriptor->offset;
+
+    struct IoReadArg arg = {
+      .offset = descriptor->offset,
+      .address = data,
+      .size = to_read
+    };
+    int r = iso_cache_read(&arg);
+
+    if(r < 0){
+      return r;
+    }
+
+    int expected_offset = descriptor->offset + r;
+    if(r != to_read){
+      debugPrintf("iso cache and seek fd seem to have desynced\n");
+    }
+
+    descriptor->offset = expected_offset;
+    return r;
+  }
 
   int seek = 0;
 
@@ -335,6 +398,30 @@ static SceOff ScePspemuMsfsLseek(SceUID fd, SceOff offset, int whence) {
   ScePspemuMsfsDescriptor *descriptor = ScePspemuMsfsGetDescriptor(fd);
   if (!descriptor)
     return SCE_ERROR_ERRNO_EINVAL;
+
+  if(descriptor->iso_cache){
+    SceOff res = sceIoLseek(iso_cache_fd(), descriptor->offset, SCE_SEEK_SET);
+    if((int)res == SCE_ERROR_ERRNO_ENODEV){
+      iso_cache_init("");
+      res = sceIoLseek(iso_cache_fd(), descriptor->offset, SCE_SEEK_SET);
+      if(res < 0){
+        return res;
+      }
+    }
+
+    res = sceIoLseek(iso_cache_fd(), offset, whence);
+    if((int)res == SCE_ERROR_ERRNO_ENODEV){
+      iso_cache_init("");
+      res = sceIoLseek(iso_cache_fd(), descriptor->offset, SCE_SEEK_SET);
+      if(res >= 0){
+        res = sceIoLseek(iso_cache_fd(), offset, whence);
+      }
+    }
+    if((int)res >= 0){
+      descriptor->offset = res;
+    }
+    return res;
+  }
 
   SceOff res = sceIoLseek(descriptor->fd, offset, whence);
 
@@ -405,7 +492,7 @@ static SceUID ScePspemuMsfsDopen(const char *dirname) {
   if (dfd < 0)
     return dfd;
 
-  return ScePspemuMsfsAddDescriptor(dfd, (char *)dirname, 0, 0, 1);
+  return ScePspemuMsfsAddDescriptor(dfd, (char *)dirname, 0, 0, 1, 0);
 }
 
 static int ScePspemuMsfsDclose(SceUID fd) {
