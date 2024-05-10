@@ -440,7 +440,7 @@ int infernoCacheInit(int cache_size, int cache_num)
 
 	cache_on = 1;
 
-	printk("cache is now on with size: %d, segments: %d\n", g_caches_cap, g_caches_num);
+	printk("cache is now on with chunk size: %d, chunks: %d\n", g_caches_cap, g_caches_num);
 
 	return 0;
 }
