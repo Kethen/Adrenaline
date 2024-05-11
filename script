@@ -71,6 +71,7 @@ make
 cd "$project_pwd"
 
 cp user_build/adrenaline_user.suprx bubble/pkg/sce_module/adrenaline_user.suprx
+cp kernel_build/adrenaline_kernel.skprx bubble/pkg/sce_module/adrenaline_kernel.skprx
 
 rm -rf bubble_build
 mkdir -p bubble_build

@@ -477,6 +477,9 @@ static SceUID sceKernelCreateThreadPatched(const char *name, SceKernelThreadEntr
     entry = (SceKernelThreadEntry)ScePspemuRemoteMsfs;
     //cpuAffinityMask = SCE_KERNEL_CPU_MASK_USER_ALL;
   }
+  if(cpuAffinityMask == SCE_KERNEL_CPU_MASK_USER_2){
+    cpuAffinityMask = SCE_KERNEL_CPU_MASK_USER_2 | SCE_KERNEL_CPU_MASK_SYSTEM;
+  }
 
   return TAI_CONTINUE(SceUID, sceKernelCreateThreadRef, name, entry, initPriority, stackSize, attr, cpuAffinityMask, option);
 }

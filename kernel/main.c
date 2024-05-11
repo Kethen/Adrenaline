@@ -43,6 +43,7 @@ static tai_hook_ref_t SceGrabForDriver_E9C25A28_ref;
 static tai_hook_ref_t sceCompatSecSetSSRAMAclRef;
 static tai_hook_ref_t ksceSblAimgrIsDEXRef;
 static tai_hook_ref_t ksceKernelStartPreloadedModulesRef;
+static tai_hook_ref_t isIllegalAffinityRef;
 
 static int hooks[8];
 static int n_hooks = 0;
@@ -136,6 +137,11 @@ static int ksceKernelStartPreloadedModulesPatched(SceUID pid) {
   return res;
 }
 
+// from https://github.com/GrapheneCt/CapUnlocker/blob/master/main.c
+static int isIllegalAffinity_patched(int a1, int a2, int a3) {
+  return 0;
+}
+
 int kuCtrlPeekBufferPositive(int port, SceCtrlData *pad_data, int count) {
   uint32_t state;
   ENTER_SYSCALL(state);
@@ -206,10 +212,16 @@ int module_start(SceSize args, void *argp) {
   SceUID shell_pid = ksceKernelSysrootGetShellPid();
   ksceKernelLoadStartModuleForPid(shell_pid, "ux0:app/" ADRENALINE_TITLEID "/sce_module/adrenaline_vsh.suprx", 0, NULL, 0, NULL, NULL);
 
+  // from https://github.com/GrapheneCt/CapUnlocker/blob/master/main.c
+  taiGetModuleInfoForKernel(KERNEL_PID, "SceKernelThreadMgr", &info);
+  hooks[n_hooks] = taiHookFunctionOffsetForKernel(KERNEL_PID, &isIllegalAffinityRef, info.modid, 0, 0x114C, 1, isIllegalAffinity_patched);
+  n_hooks++;
+
   return SCE_KERNEL_START_SUCCESS;
 }
 
 int module_stop(SceSize args, void *argp) {
+  taiHookReleaseForKernel(hooks[--n_hooks], isIllegalAffinityRef);
   taiHookReleaseForKernel(hooks[--n_hooks], ksceKernelStartPreloadedModulesRef);
   taiHookReleaseForKernel(hooks[--n_hooks], ksceSblAimgrIsDEXRef);
   taiHookReleaseForKernel(hooks[--n_hooks], SceGrabForDriver_E9C25A28_ref);

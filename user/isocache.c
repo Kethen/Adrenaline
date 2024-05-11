@@ -27,7 +27,7 @@ static struct IoReadArg *worker_task;
 	debugPrintf(__VA_ARGS__); \
 }
 
-#define g_caches_cap 4096
+#define g_caches_cap 8192
 #define g_caches_num (141 * 1024 * 1024 / g_caches_cap)
 
 struct ISOCache{
@@ -253,7 +253,7 @@ void iso_cache_init(const char *path){
 	}
 
 	if(worker_thid < 0){
-	    worker_thid = sceKernelCreateThread("ScePspemuISOCacheWorker", iso_cache_worker, 0x60, 0x1000, 0, SCE_KERNEL_CPU_MASK_USER_1, NULL);
+	    worker_thid = sceKernelCreateThread("ScePspemuISOCacheWorker", iso_cache_worker, 0x60, 0x1000, 0, SCE_KERNEL_CPU_MASK_USER_1 | SCE_KERNEL_CPU_MASK_SYSTEM, NULL);
 	    if(worker_thid < 0){
 	        LOG("failed creating iso cache worker thread, 0x%08x, exiting now\n", worker_thid);
 	        ScePspemuErrorExit(0);
