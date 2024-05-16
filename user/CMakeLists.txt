@@ -56,6 +56,7 @@ add_executable(adrenaline_user
   utils.c
   math_utils.c
   lz4/lz4.c
+  ge_peek.c
 )
 
 target_link_libraries(adrenaline_user

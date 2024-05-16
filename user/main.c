@@ -50,9 +50,12 @@
 
 #include "msfs.h"
 
+#include "ge_peek.h"
+
 #include "lz4/lz4.h"
 
 #include "startdat.h"
+
 
 INCLUDE_EXTERN_RESOURCE(payloadex_bin);
 
@@ -452,6 +455,10 @@ static int sceCompatWaitSpecialRequestPatched(int mode) {
   // Init Adrenaline
   InitAdrenaline();
 
+  debugPrintf("running init_ge_peek()\n");
+  init_ge_peek();
+  debugPrintf("finished running init_ge_peek()\n");
+
   // Clear 0x8A000000 memory
   sceDmacMemset((void *)0x63000000, 0, 16 * 1024 * 1024);
   sceCompatCache(SCE_COMPAT_CACHE_WRITEBACK, (void *)0x63000000, 16 * 1024 * 1024);
@@ -479,6 +486,7 @@ static SceUID sceKernelCreateThreadPatched(const char *name, SceKernelThreadEntr
   }
   if(cpuAffinityMask == SCE_KERNEL_CPU_MASK_USER_2){
     cpuAffinityMask = SCE_KERNEL_CPU_MASK_USER_2 | SCE_KERNEL_CPU_MASK_SYSTEM;
+    debugPrintf("cpuAffinity changed to 0x%08x\n", cpuAffinityMask);
   }
 
   return TAI_CONTINUE(SceUID, sceKernelCreateThreadRef, name, entry, initPriority, stackSize, attr, cpuAffinityMask, option);

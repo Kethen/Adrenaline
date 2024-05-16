@@ -1,3 +1,4 @@
+0x03090010
 $/kd/sysmem.prx VGUPAEM
 $/kd/loadcore.prx VGUPAEM
 $/kd/exceptionman.prx VGUPAEM
@@ -37,6 +38,7 @@ $/kd/npdrm.prx VPEM
 $/kd/iofilemgr_dnas.prx VGPAEM
 $/kd/inferno.prx GEM
 $/kd/isofs.prx GEM
+$/kd/ge_peek.prx GEM
 $/kd/chnnlsv.prx VP
 $/kd/kermit_utility.prx VGUPAEM
 $/kd/popsman.prx P

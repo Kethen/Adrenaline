@@ -33,6 +33,7 @@
 
 INCLUDE_EXTERN_RESOURCE(kd_galaxy_prx);
 INCLUDE_EXTERN_RESOURCE(kd_inferno_prx);
+INCLUDE_EXTERN_RESOURCE(kd_ge_peek_prx);
 INCLUDE_EXTERN_RESOURCE(kd_kermit_idstorage_prx);
 INCLUDE_EXTERN_RESOURCE(kd_libpsardumper_prx);
 INCLUDE_EXTERN_RESOURCE(kd_march33_prx);
@@ -56,6 +57,7 @@ typedef struct {
 static ScePspemuFlash0Package custom_package[] = {
   FLASH0_FILE("/kd/galaxy.prx",           kd_galaxy_prx),
   FLASH0_FILE("/kd/inferno.prx",          kd_inferno_prx),
+  FLASH0_FILE("/kd/ge_peek.prx",          kd_ge_peek_prx),
   FLASH0_FILE("/kd/kermit_idstorage.prx", kd_kermit_idstorage_prx),
   FLASH0_FILE("/kd/libpsardumper.prx",    kd_libpsardumper_prx),
   FLASH0_FILE("/kd/march33.prx",          kd_march33_prx),

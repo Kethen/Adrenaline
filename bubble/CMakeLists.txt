@@ -10,8 +10,8 @@ endif()
 
 project(adrenaline)
 include("${VITASDK}/share/vita.cmake" REQUIRED)
-set(VITA_APP_NAME "Adrenaline")
-set(VITA_TITLEID  "PSPEMUCFW")
+set(VITA_APP_NAME "Adrenaline GE")
+set(VITA_TITLEID  "PGEEMUCFW")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,-q -Wall -O3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions")
@@ -38,7 +38,7 @@ target_link_libraries(adrenaline
 )
 
 vita_create_self(eboot.bin adrenaline UNSAFE)
-vita_create_vpk(Adrenaline.vpk ${VITA_TITLEID} eboot.bin
+vita_create_vpk(Adrenaline_GE.vpk ${VITA_TITLEID} eboot.bin
   VERSION ${VITA_VERSION}
   NAME ${VITA_APP_NAME}
   FILE pkg/sce_sys/icon0.png sce_sys/icon0.png

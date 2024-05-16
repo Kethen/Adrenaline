@@ -203,7 +203,7 @@ int main() {
 	// Load kernel module
 	res = taiLoadStartKernelModule("ux0:app/" ADRENALINE_TITLEID "/sce_module/adrenaline_kernel.skprx", 0, NULL, 0);
 	if (res < 0) {
-		printf("Could not load adrenaline_kernel.skprx. Please uninstall the old Adrenaline first.");
+		printf("Could not load adrenaline_kernel.skprx 0x%08x. Please uninstall the old Adrenaline first.", res);
 		while (1);
 	}
 

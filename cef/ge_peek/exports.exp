@@ -1,0 +1,29 @@
+PSP_BEGIN_EXPORTS
+
+PSP_EXPORT_START(syslib, 0, 0x8000)
+PSP_EXPORT_FUNC(module_start)
+PSP_EXPORT_VAR(module_info)
+PSP_EXPORT_END
+
+PSP_EXPORT_START(ge_peeklib, 0, 0x4001)
+PSP_EXPORT_FUNC(sceGeEdramGetAddrPatched)
+PSP_EXPORT_FUNC(sceGeListEnQueuePatched)
+PSP_EXPORT_FUNC(sceGeListEnQueueHeadPatched)
+PSP_EXPORT_FUNC(sceGeListUpdateStallAddrPatched)
+PSP_EXPORT_FUNC(sceGeListSyncPatched)
+PSP_EXPORT_FUNC(sceGeDrawSyncPatched)
+PSP_EXPORT_FUNC(sceGeBreakPatched)
+PSP_EXPORT_FUNC(sceGeContinuePatched)
+PSP_EXPORT_FUNC(sceGeSetCallbackPatched)
+PSP_EXPORT_FUNC(sceGeUnsetCallbackPatched)
+PSP_EXPORT_FUNC(sceGeEdramGetSizePatched)
+PSP_EXPORT_FUNC(sceGeEdramSetAddrTranslationPatched)
+PSP_EXPORT_FUNC(sceGeGetCmdPatched)
+PSP_EXPORT_FUNC(sceGeGetMtxPatched)
+PSP_EXPORT_FUNC(sceGeSaveContextPatched)
+PSP_EXPORT_FUNC(sceGeRestoreContextPatched)
+PSP_EXPORT_FUNC(sceGeListDeQueuePatched)
+PSP_EXPORT_FUNC(sceGeGetStackPatched)
+PSP_EXPORT_END
+
+PSP_END_EXPORTS

@@ -6,6 +6,19 @@ project_pwd=$(realpath "$project_pwd")
 cp procfw_sdk_prebuilt/include/* /usr/local/pspdev/psp/sdk/include/
 cp procfw_sdk_prebuilt/lib/* /usr/local/pspdev/psp/sdk/lib/
 
+cd cef/ge_peek
+make clean
+make
+cd "$project_pwd"
+
+cp cef/ge_peek/ge_peek.prx user/flash0/kd/ge_peek.prx
+
+cd cef/btcnf/pspbtcnf_inferno
+btcnf build pspbtcnf.txt
+cd "$project_pwd"
+
+cp cef/btcnf/pspbtcnf_inferno/pspbtcnf.bin user/flash0/kd/pspbtknf.bin
+
 cd cef/inferno
 make clean
 make
@@ -71,6 +84,7 @@ make
 cd "$project_pwd"
 
 cp user_build/adrenaline_user.suprx bubble/pkg/sce_module/adrenaline_user.suprx
+cp vsh_build/adrenaline_vsh.suprx bubble/pkg/sce_module/adrenaline_vsh.suprx
 cp kernel_build/adrenaline_kernel.skprx bubble/pkg/sce_module/adrenaline_kernel.skprx
 
 rm -rf bubble_build
