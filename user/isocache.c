@@ -413,11 +413,13 @@ static int _iso_cache_read(struct IoReadArg *arg)
 	ret = get_hit_caches(pos, len, data, &last_cache);
 
 	if(ret < 0) {
+		/*
 		// abandon the caching, because the bufsize is too small
 		// if we cache it then random access performance will be hurt
 		if(arg->size < (uint32_t)g_caches_cap) {
 			return iso_read(arg);
 		}
+		*/
 
 		ret = add_cache(arg);
 		read_missed += len;
